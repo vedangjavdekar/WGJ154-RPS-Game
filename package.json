@@ -1,0 +1,18 @@
+{
+	"name": "phaser3-ts-template",
+	"version": "1.0.0",
+	"description": "A Phaser 3 Project Template using Parcel and TypeScript",
+	"scripts": {
+		"start": "parcel index.html",
+		"assets": "node utils/filepaths.js -dir \"./dist/Assets/\" -out \"./src/\" -file \"assetpaths.ts\" -log"
+	},
+	"repository": {},
+	"author": "Vedang Javdekar",
+	"license": "MIT",
+	"dependencies": {},
+	"devDependencies": {
+		"parcel-bundler": "^1.12.4",
+		"phaser": "^3.22.0",
+		"typescript": "^3.9.2"
+	}
+}

@@ -1,0 +1,22 @@
+* {
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+/* if using custom fonts uncomment the following */
+/*
+@font-face {
+	font-family: fontname;
+	src: url("font-file-path");
+	font-weight: normal;
+}
+.fontLoader {
+	position: absolute;
+	left: -1000px;
+	visibility: hidden;
+}
+*/
+
+
+/*# sourceMappingURL=/styles.8986bff4.css.map */
