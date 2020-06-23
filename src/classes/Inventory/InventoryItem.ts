@@ -1,4 +1,4 @@
-import InventoryManager from "./Inventorymanager";
+import { SPRITE_SCALE_UP } from "../../scenes/Crafting/CraftingUIScene";
 
 type statProp = number | null;
 
@@ -17,7 +17,6 @@ export class InventoryItemData {
 export default class InventoryItem extends Phaser.GameObjects.Sprite {
 	constructor(scene: Phaser.Scene, x: number, y: number, itemId: number) {
 		super(scene, x, y, "gameobjects", itemId);
-		this.setScale(5);
-		//this.itemData = InventoryManager.getInstance().getItemById(itemId);
+		this.setScale(SPRITE_SCALE_UP);
 	}
 }

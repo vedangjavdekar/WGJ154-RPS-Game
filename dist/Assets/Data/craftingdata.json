@@ -64,5 +64,16 @@
 		"range": null,
 		"ammo": null,
 		"slots": null
+	},
+	{
+		"id": 6,
+		"name": "Spikes",
+		"category": "Defense",
+		"resourceExhausted": false,
+		"attack": 5,
+		"defense": 30,
+		"range": null,
+		"ammo": null,
+		"slots": null
 	}
 ]

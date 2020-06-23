@@ -159,7 +159,7 @@ export default class StatCard extends Phaser.GameObjects.Container {
 	changeCardTween(index: number) {
 		this.scene.tweens.add({
 			targets: this,
-			duration: 300,
+			duration: 150,
 			yoyo: true,
 			x: {
 				from: 1072,
@@ -178,7 +178,6 @@ export default class StatCard extends Phaser.GameObjects.Container {
 	fillCardData(index: number) {
 		if (index === -1) return;
 		const data = this.inventorymanager.getItemByIndex(index);
-		console.log(data);
 		this.title.setText(data.name);
 		this.category.setText(data.category);
 		this.exhausted.setText(

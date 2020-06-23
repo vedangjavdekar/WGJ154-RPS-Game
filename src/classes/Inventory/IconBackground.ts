@@ -1,5 +1,6 @@
 import GameEventEmitter, { GAME_EVENTS } from "../GameEvents";
-import InventoryManager from "./Inventorymanager";
+import { SOUNDS } from "../../scenes/SFXScene";
+import CraftingUIScene from "../../scenes/Crafting/CraftingUIScene";
 
 class Icons extends Phaser.GameObjects.Container {
 	protected static GEventEmitter: GameEventEmitter;
@@ -19,22 +20,11 @@ class Icons extends Phaser.GameObjects.Container {
 		this.add([this.buttonImage, this.buttonZone]);
 		scene.add.existing(this);
 	}
-
-	enablePointerInteraction() {
-		this.buttonZone.setInteractive();
-		this.buttonZone.on("pointerover", () => {
-			this.buttonImage.setFrame(1);
-		});
-
-		this.buttonZone.on("pointerout", () => {
-			this.buttonImage.setFrame(0);
-		});
-	}
 }
 
 export class IconBackground extends Icons {
 	public static selectedIndex: number = -1;
-
+	public static iconDragged: boolean = false;
 	private id: number;
 	constructor(scene: Phaser.Scene, x: number, y: number, id: number) {
 		super(scene, x, y);
@@ -49,22 +39,36 @@ export class IconBackground extends Icons {
 	}
 	setPointerCallbacks() {
 		this.buttonZone.on("pointerover", () => {
+			if (CraftingUIScene.disableInventory) return;
+			if (IconBackground.iconDragged) return;
 			if (IconBackground.selectedIndex !== this.id) {
 				this.buttonImage.setFrame(1);
 			}
 		});
 
 		this.buttonZone.on("pointerout", () => {
+			if (CraftingUIScene.disableInventory) return;
+			if (IconBackground.iconDragged) return;
 			if (IconBackground.selectedIndex !== this.id) {
 				this.buttonImage.setFrame(0);
 			}
 		});
 
 		this.buttonZone.on("pointerdown", () => {
-			IconBackground.selectedIndex = this.id;
-			this.buttonImage.setFrame(2);
-			Icons.GEventEmitter.emit(GAME_EVENTS.c_changeSelection, this.id);
-			console.log("selected index: " + this.id);
+			if (CraftingUIScene.disableInventory) return;
+			Icons.GEventEmitter.emit(GAME_EVENTS.sfx_playSound, SOUNDS.BUTTON);
+			IconBackground.iconDragged = true;
+			Icons.GEventEmitter.emit(
+				GAME_EVENTS.c_dragIconPointerDown,
+				this.id
+			);
+			if (IconBackground.selectedIndex !== this.id) {
+				IconBackground.selectedIndex = this.id;
+				Icons.GEventEmitter.emit(
+					GAME_EVENTS.c_changeSelection,
+					this.id
+				);
+			}
 		});
 	}
 	enablePointerInteraction() {
@@ -78,12 +82,48 @@ export class IconBackground extends Icons {
 	onchangeSelection(id: number) {
 		if (IconBackground.selectedIndex !== this.id) {
 			this.buttonImage.setFrame(0);
+		} else {
+			this.buttonImage.setFrame(2);
 		}
 	}
 }
 export class CrafingIconBackground extends Icons {
-	constructor(scene: Phaser.Scene, x: number, y: number) {
+	id: string | number;
+	constructor(
+		scene: Phaser.Scene,
+		x: number,
+		y: number,
+		id: string | number
+	) {
 		super(scene, x, y);
+		this.id = id;
 		this.buttonImage.setTexture("c_crafticon", 0);
+	}
+
+	setPointerCallbacks() {
+		this.buttonZone.setInteractive();
+		this.buttonZone.on("pointerover", () => {
+			if (CraftingUIScene.disableInventory) return;
+			if (IconBackground.iconDragged) {
+				this.buttonImage.setFrame(1);
+				Icons.GEventEmitter.emit(
+					GAME_EVENTS.c_craftingIconPointerOver,
+					this.id
+				);
+			}
+		});
+
+		this.buttonZone.on("pointerout", () => {
+			if (CraftingUIScene.disableInventory) return;
+			this.buttonImage.setFrame(0);
+			Icons.GEventEmitter.emit(
+				GAME_EVENTS.c_craftingIconPointerOut,
+				this.id
+			);
+		});
+	}
+
+	iconPlaced() {
+		this.buttonImage.setFrame(0);
 	}
 }

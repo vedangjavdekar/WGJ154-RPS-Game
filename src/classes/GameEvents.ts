@@ -2,9 +2,15 @@ export enum GAME_EVENTS {
 	buttonClick = "buttonClick",
 	gameStarted = "gameStarted",
 	gameOver = "gameOver",
+	//Sounds
+	sfx_playSound = "sfx_playSound",
+	sfx_stopSound = "Sfx_stopSound",
 
 	//Crafting Events
 	c_changeSelection = "c_changeSelection",
+	c_dragIconPointerDown = "c_dragIconPointerDown",
+	c_craftingIconPointerOver = "c_craftingIconPointerOver",
+	c_craftingIconPointerOut = "c_craftingIconPointerOut",
 }
 
 export default class GameEventEmitter extends Phaser.Events.EventEmitter {

@@ -2,6 +2,7 @@ import { SCENES, gameScreen, MainMenuConfig } from "../config";
 import GameEventEmitter, { GAME_EVENTS } from "../classes/GameEvents";
 import IButtonConfig, { ButtonIds } from "../classes/Button/IButtonConfig";
 import Button from "../classes/Button/Button";
+import { SOUNDS } from "./SFXScene";
 
 export default class MenuScene extends Phaser.Scene {
 	private GEventEmitter: GameEventEmitter;
@@ -18,8 +19,13 @@ export default class MenuScene extends Phaser.Scene {
 			this.GEventEmitter.clearEvent(clearEvents[event]);
 		}
 	}
+	preload() {}
 
 	create() {
+		this.GEventEmitter.emit(GAME_EVENTS.sfx_playSound, SOUNDS.MAINMENU, {
+			loop: true,
+			volume: 0.05,
+		});
 		this.add
 			.text(gameScreen.width / 2, gameScreen.height / 4, "Game Title", {
 				font: `${MainMenuConfig.title.fontSize}px gameFont`,
@@ -79,11 +85,18 @@ export default class MenuScene extends Phaser.Scene {
 	onBattleClicked() {
 		console.log("Battle Clicked");
 		this.onChangeScene([SCENES.GAME], 500);
+		this.GEventEmitter.emit(GAME_EVENTS.sfx_stopSound, SOUNDS.MAINMENU);
+		this.GEventEmitter.emit(GAME_EVENTS.sfx_playSound, SOUNDS.BUTTONBATTLE);
 	}
 
 	onCraftClicked() {
 		console.log("Craft Clicked");
 		this.onChangeScene([SCENES.CRAFTING_UI], 500);
+		this.GEventEmitter.emit(GAME_EVENTS.sfx_stopSound, SOUNDS.MAINMENU);
+		this.GEventEmitter.emit(
+			GAME_EVENTS.sfx_playSound,
+			SOUNDS.BUTTONCRAFTING
+		);
 	}
 
 	//First scene would be started the rest would be launched

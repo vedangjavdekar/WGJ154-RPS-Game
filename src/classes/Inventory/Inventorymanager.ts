@@ -2,10 +2,17 @@ import { InventoryItemData } from "./InventoryItem";
 import { ASSET_PATHS } from "../../assetpaths";
 import { dataKey } from "./config";
 
+type combination = {
+	elements: [number, number];
+	craftedId: number;
+};
+
 export default class InventoryManager {
 	private static instance: InventoryManager;
 	private static master: Array<InventoryItemData>;
 	private static crafted: Array<InventoryItemData>;
+	private static combinationTree: Array<combination>;
+
 	public static getInstance() {
 		if (!InventoryManager.instance) {
 			InventoryManager.instance = new InventoryManager();
@@ -27,6 +34,11 @@ export default class InventoryManager {
 		console.log({ crafted: InventoryManager.crafted });
 	}
 
+	public loadCombinations(combinations) {
+		InventoryManager.combinationTree = combinations;
+		console.log(InventoryManager.combinationTree);
+	}
+
 	public getCraftedItems(): Array<InventoryItemData> {
 		return InventoryManager.crafted;
 	}
@@ -41,5 +53,29 @@ export default class InventoryManager {
 
 	public getItemByIndex(index: number): InventoryItemData {
 		return InventoryManager.crafted[index];
+	}
+
+	private addNewCraftedItem(id: number) {
+		InventoryManager.crafted.push(InventoryManager.master[id]);
+	}
+	public craftNewItem(elements: number[]): number {
+		console.log(JSON.stringify(elements));
+		let combi = InventoryManager.combinationTree.find(
+			(item) => JSON.stringify(item.elements) === JSON.stringify(elements)
+		);
+		if (combi !== undefined) {
+			const newItem = InventoryManager.crafted.find(
+				(item) => item.id === combi.craftedId
+			);
+			if (newItem === undefined) {
+				this.addNewCraftedItem(combi.craftedId);
+
+				console.log(this.getCraftedIndices());
+				return combi.craftedId;
+			}
+			return -1;
+		} else {
+			return -2;
+		}
 	}
 }

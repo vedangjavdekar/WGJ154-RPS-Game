@@ -12,5 +12,8 @@ export const ButtonIds = {
 	},
 	Crafing: {
 		exit: "c_exit",
+		craftingIcon1: "c_craftingicon1",
+		craftingIcon2: "c_craftingicon2",
+		result: "c_result",
 	},
 };

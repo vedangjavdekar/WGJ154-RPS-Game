@@ -20,12 +20,11 @@ const referenceResolution = { width: 1280, height: 720 };
 
 export var config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
-	backgroundColor: 0x454545,
+	backgroundColor: 0x232323,
 	width: referenceResolution.width,
 	height: referenceResolution.height,
 	//@ts-ignore
-	roundPixels: false,
-	antialias: false,
+	pixelArt: true,
 	physics: {
 		default: "arcade",
 		arcade: {
@@ -49,6 +48,9 @@ export var config: Phaser.Types.Core.GameConfig = {
 		CraftingUIScene,
 		GameOverScene,
 	],
+	audio: {
+		disableWebAudio: true,
+	},
 };
 
 /*
@@ -74,8 +76,9 @@ const FontSizes = {
 export const LoadingBarConfig = {
 	scaleX: 4,
 	scaleY: 2,
-	fontSize: 20,
+	fontSize: FontSizes.h5,
 	fontColor: "#fff",
+	playButtonFontSize: FontSizes.h3,
 };
 
 export const MainMenuConfig = {

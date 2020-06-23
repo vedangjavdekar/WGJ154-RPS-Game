@@ -2,6 +2,7 @@ import { SCENES, LoadingBarConfig, gameScreen } from "../config";
 import { ASSET_PATHS } from "../assetpaths";
 import InventoryManager from "../classes/Inventory/Inventorymanager";
 import { dataKey } from "../classes/Inventory/config";
+import { SOUNDS } from "./SFXScene";
 
 export default class LoadScene extends Phaser.Scene {
 	constructor() {
@@ -39,6 +40,37 @@ export default class LoadScene extends Phaser.Scene {
 			.setOrigin(0.5)
 			.setAlign("center");
 
+		loadingState
+			.on("pointerover", () => {
+				loadingState.setFontSize(
+					LoadingBarConfig.playButtonFontSize + 4
+				);
+			})
+			.on("pointerout", () => {
+				loadingState.setFontSize(LoadingBarConfig.playButtonFontSize);
+			})
+			.on("pointerdown", () => {
+				loadingState.setFontSize(
+					LoadingBarConfig.playButtonFontSize + 2
+				);
+				this.cameras.main.fadeOut(500);
+				this.cameras.main.once("camerafadeoutcomplete", () => {
+					this.scene.start(SCENES.SFX);
+				});
+			});
+
+		const showPlayButton = this.tweens.add({
+			targets: loadingState,
+			duration: 500,
+			alpha: { from: 0, to: 1 },
+			ease: "Cubic.Out",
+			paused: true,
+			onComplete: (tween: Phaser.Tweens.Tween) => {
+				tween.remove();
+				loadingState.setInteractive();
+			},
+		});
+
 		this.load.on("progress", (value: number) => {
 			progressFill.setScale(
 				value * LoadingBarConfig.scaleX,
@@ -52,7 +84,7 @@ export default class LoadScene extends Phaser.Scene {
 				targets: container,
 				duration: 500,
 				alpha: { from: 1, to: 0 },
-				ease: "cubic.out",
+				ease: "Cubic.easeInOut",
 				onComplete: (tween: Phaser.Tweens.Tween) => {
 					tween.remove();
 				},
@@ -62,20 +94,22 @@ export default class LoadScene extends Phaser.Scene {
 				delay: 200,
 				duration: 500,
 				alpha: { from: 1, to: 0 },
-				ease: "cubic.out",
+				ease: "Cubic.Out",
 				onComplete: (tween: Phaser.Tweens.Tween) => {
 					tween.remove();
-					this.cameras.main.fadeOut(500);
-					this.cameras.main.once("camerafadeoutcomplete", () => {
-						this.scene.start(SCENES.MENU);
-						this.scene.launch(SCENES.SFX);
-					});
+					loadingState.setText("PLAY GAME");
+					loadingState.setFontSize(
+						LoadingBarConfig.playButtonFontSize
+					);
+					showPlayButton.resume();
 				},
 			});
 		});
+
 		//#endregion
 
 		this.load.json("database", ASSET_PATHS.DATA.CRAFTINGDATA);
+		this.load.json("combinationtree", ASSET_PATHS.DATA.COMBINATIONTREE);
 
 		//This will be a sprite atlas with names matching to those with the craftingdata
 		this.load.spritesheet("gameobjects", ASSET_PATHS.SPRITES.SPRITESHEET, {
@@ -153,6 +187,41 @@ export default class LoadScene extends Phaser.Scene {
 			ASSET_PATHS.SPRITES.CRAFTINGLAYOUT.SYMBOLS.EQUALTO
 		);
 		//#endregion
+
+		//#region MUSIC AND SFX
+		this.load.audio(SOUNDS.BUTTONCRAFTING, [
+			ASSET_PATHS.SOUNDS.BUTTONCRAFTING_MP3,
+			ASSET_PATHS.SOUNDS.BUTTONCRAFTING_OGG,
+		]);
+		this.load.audio(SOUNDS.BUTTONBATTLE, [
+			ASSET_PATHS.SOUNDS.BUTTONBATTLE_MP3,
+			ASSET_PATHS.SOUNDS.BUTTONBATTLE_OGG,
+		]);
+		this.load.audio(SOUNDS.BUTTON, [
+			ASSET_PATHS.SOUNDS.BUTTON_MP3,
+			ASSET_PATHS.SOUNDS.BUTTON_OGG,
+		]);
+		this.load.audio(SOUNDS.CARDSWIPE, [
+			ASSET_PATHS.SOUNDS.CARDSWIPE_MP3,
+			ASSET_PATHS.SOUNDS.CARDSWIPE_OGG,
+		]);
+		this.load.audio(SOUNDS.DESTROYOBJECT, [
+			ASSET_PATHS.SOUNDS.DESTROYOBJECT_MP3,
+			ASSET_PATHS.SOUNDS.DESTROYOBJECT_OGG,
+		]);
+		this.load.audio(SOUNDS.PLACEOBJECT, [
+			ASSET_PATHS.SOUNDS.PLACEOBJECT_MP3,
+			ASSET_PATHS.SOUNDS.PLACEOBJECT_OGG,
+		]);
+		this.load.audio(SOUNDS.MAINMENU, [
+			ASSET_PATHS.SOUNDS.MAINMENU_MP3,
+			ASSET_PATHS.SOUNDS.MAINMENU_OGG,
+		]);
+		this.load.audio(SOUNDS.NEWITEMCRAFTED, [
+			ASSET_PATHS.SOUNDS.NEWITEMCRAFTED_MP3,
+			ASSET_PATHS.SOUNDS.NEWITEMCRAFTED_OGG,
+		]);
+		//#endregion
 	}
 	create() {
 		const data = this.cache.json.get("database");
@@ -160,9 +229,12 @@ export default class LoadScene extends Phaser.Scene {
 		window.localStorage.removeItem(dataKey);
 		//*******************************************************************************/
 		if (window.localStorage.getItem(dataKey) === null) {
-			let initialData = [0, 1, 2, 3, 4, 5, 3, 2];
+			let initialData = [0, 1, 2];
 			window.localStorage.setItem(dataKey, JSON.stringify(initialData));
 		}
-		InventoryManager.getInstance().loadDataBase(data);
+
+		const instance = InventoryManager.getInstance();
+		instance.loadDataBase(data);
+		instance.loadCombinations(this.cache.json.get("combinationtree"));
 	}
 }
