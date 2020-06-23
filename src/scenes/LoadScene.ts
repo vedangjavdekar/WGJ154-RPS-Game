@@ -226,7 +226,7 @@ export default class LoadScene extends Phaser.Scene {
 	create() {
 		const data = this.cache.json.get("database");
 		//********************** DELETE THIS IN ACTUAL GAME *****************************/
-		window.localStorage.removeItem(dataKey);
+		//window.localStorage.removeItem(dataKey);
 		//*******************************************************************************/
 		if (window.localStorage.getItem(dataKey) === null) {
 			let initialData = [0, 1, 2];

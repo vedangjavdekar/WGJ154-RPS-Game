@@ -57,6 +57,10 @@ export default class InventoryManager {
 
 	private addNewCraftedItem(id: number) {
 		InventoryManager.crafted.push(InventoryManager.master[id]);
+		window.localStorage.setItem(
+			dataKey,
+			JSON.stringify(this.getCraftedIndices())
+		);
 	}
 	public craftNewItem(elements: number[]): number {
 		console.log(JSON.stringify(elements));
