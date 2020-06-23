@@ -110,6 +110,12 @@ export default class LoadScene extends Phaser.Scene {
 
 		this.load.json("database", ASSET_PATHS.DATA.CRAFTINGDATA);
 		this.load.json("combinationtree", ASSET_PATHS.DATA.COMBINATIONTREE);
+		/*TESTING
+		this.load.json(
+			"combinationtreearray",
+			ASSET_PATHS.DATA.COMBINATIONTREEARRAY
+		);
+		TESTING*/
 
 		//This will be a sprite atlas with names matching to those with the craftingdata
 		this.load.spritesheet("gameobjects", ASSET_PATHS.SPRITES.SPRITESHEET, {
@@ -226,7 +232,7 @@ export default class LoadScene extends Phaser.Scene {
 	create() {
 		const data = this.cache.json.get("database");
 		//********************** DELETE THIS IN ACTUAL GAME *****************************/
-		//window.localStorage.removeItem(dataKey);
+		window.localStorage.removeItem(dataKey);
 		//*******************************************************************************/
 		if (window.localStorage.getItem(dataKey) === null) {
 			let initialData = [0, 1, 2];
@@ -236,5 +242,11 @@ export default class LoadScene extends Phaser.Scene {
 		const instance = InventoryManager.getInstance();
 		instance.loadDataBase(data);
 		instance.loadCombinations(this.cache.json.get("combinationtree"));
+
+		/*Multiple Items Output
+		instance.loadCombinationsArray(
+			this.cache.json.get("combinationtreearray")
+		);
+		*/
 	}
 }

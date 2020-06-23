@@ -306,10 +306,20 @@ export default class CraftingUIScene extends Phaser.Scene {
 						Math.min(elem1id, elem2id),
 						Math.max(elem1id, elem2id),
 					];
+
 					const newItemId = this.inventoryManager.craftNewItem(
 						elements
 					);
 					this.craftResultTween(newItemId);
+
+					/* TESTING
+					const newItemIds = this.inventoryManager.CraftNewItemReturnMultiple(
+						elements
+					);
+					newItemIds.forEach((newItemId) => {
+						this.craftResultTween(newItemId);
+					});
+					 TESTING */
 				}
 			} else {
 				this.dragIcon.setPosition(0, 0).setVisible(false);

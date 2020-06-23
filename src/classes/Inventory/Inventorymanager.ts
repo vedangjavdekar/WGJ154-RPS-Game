@@ -7,11 +7,22 @@ type combination = {
 	craftedId: number;
 };
 
+/*
+type combinationMultiple = {
+	elements: [number, number];
+	craftedId: number[];
+};
+*/
+
 export default class InventoryManager {
 	private static instance: InventoryManager;
 	private static master: Array<InventoryItemData>;
 	private static crafted: Array<InventoryItemData>;
 	private static combinationTree: Array<combination>;
+
+	/* TESTING 
+	private static combinationTreeMultiple: Array<combinationMultiple>;
+	TESTING */
 
 	public static getInstance() {
 		if (!InventoryManager.instance) {
@@ -38,6 +49,15 @@ export default class InventoryManager {
 		InventoryManager.combinationTree = combinations;
 		console.log(InventoryManager.combinationTree);
 	}
+
+	/*
+	//TESTING
+	public loadCombinationsArray(combinations) {
+		InventoryManager.combinationTreeMultiple = combinations;
+		console.log(InventoryManager.combinationTreeMultiple);
+	}
+	//TESTING
+	*/
 
 	public getCraftedItems(): Array<InventoryItemData> {
 		return InventoryManager.crafted;
@@ -73,7 +93,6 @@ export default class InventoryManager {
 			);
 			if (newItem === undefined) {
 				this.addNewCraftedItem(combi.craftedId);
-
 				console.log(this.getCraftedIndices());
 				return combi.craftedId;
 			}
@@ -82,4 +101,34 @@ export default class InventoryManager {
 			return -2;
 		}
 	}
+
+	/*
+	//TESTING
+	public CraftNewItemReturnMultiple(elements: number[]): number[] {
+		console.log(JSON.stringify(elements));
+		let combi = InventoryManager.combinationTreeMultiple.find(
+			(item) => JSON.stringify(item.elements) === JSON.stringify(elements)
+		);
+		if (combi !== undefined) {
+			let returnIds = [];
+
+			combi.craftedId.forEach((craftedId) => {
+				const newItem = InventoryManager.crafted.find(
+					(item) => item.id === craftedId
+				);
+				if (newItem === undefined) {
+					this.addNewCraftedItem(craftedId);
+					console.log(this.getCraftedIndices());
+					returnIds.push(craftedId);
+				} else {
+					returnIds.push(-1);
+				}
+			});
+			return returnIds;
+		} else {
+			return [-2];
+		}
+	}
+	//TESTING
+	*/
 }

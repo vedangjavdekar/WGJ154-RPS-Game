@@ -2,6 +2,7 @@ export const ASSET_PATHS = {
 	DATA: {
 		CRAFTINGDATA: "./Assets/Data/craftingdata.json",
 		COMBINATIONTREE: "./Assets/Data/combinationtree.json",
+		COMBINATIONTREEARRAY: "./Assets/Data/combinationtreeArray.json",
 	},
 	FONTS: { FONT: "./Assets/Fonts/font.woff" },
 	SOUNDS: {
