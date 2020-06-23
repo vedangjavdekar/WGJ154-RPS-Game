@@ -3,7 +3,8 @@
 	"version": "1.0.0",
 	"description": "A Phaser 3 Project Template using Parcel and TypeScript",
 	"scripts": {
-		"start": "parcel index.html",
+		"serve": "parcel index.html",
+		"build": "parcel build index.html",
 		"assets": "node utils/filepaths.js -dir \"./dist/Assets/\" -out \"./src/\" -file \"assetpaths.ts\" -log"
 	},
 	"repository": {},
@@ -12,7 +13,7 @@
 	"dependencies": {},
 	"devDependencies": {
 		"parcel-bundler": "^1.12.4",
-		"phaser": "^3.22.0",
+		"phaser": "^3.23.0",
 		"typescript": "^3.9.2"
 	}
 }

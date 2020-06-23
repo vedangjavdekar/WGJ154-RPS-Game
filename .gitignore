@@ -6,8 +6,12 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 
+#Ignore dist.zip
+*.zip
+dist/readme.txt
+
 # Vendors
 node_modules/
-
+.cache/
 # Build
 /npm-debug.log

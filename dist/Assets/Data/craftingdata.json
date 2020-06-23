@@ -1,0 +1,68 @@
+[
+	{
+		"id": 0,
+		"name": "Rock",
+		"category": "Crafting Element",
+		"resourceExhausted": false,
+		"attack": 15,
+		"defense": 5,
+		"range": null,
+		"ammo": null,
+		"slots": null
+	},
+	{
+		"id": 1,
+		"name": "Paper",
+		"category": "Crafting Element",
+		"resourceExhausted": false,
+		"attack": 0,
+		"defense": 15,
+		"range": null,
+		"ammo": null,
+		"slots": null
+	},
+	{
+		"id": 2,
+		"name": "Scissors",
+		"category": "Crafting Element",
+		"resourceExhausted": false,
+		"attack": 20,
+		"defense": 5,
+		"range": null,
+		"ammo": null,
+		"slots": null
+	},
+	{
+		"id": 3,
+		"name": "Paper Wall",
+		"category": "Defense",
+		"resourceExhausted": false,
+		"attack": 0,
+		"defense": 20,
+		"range": null,
+		"ammo": null,
+		"slots": null
+	},
+	{
+		"id": 4,
+		"name": "Rock Pieces",
+		"category": "Crafting Element",
+		"resourceExhausted": false,
+		"attack": 20,
+		"defense": 0,
+		"range": null,
+		"ammo": null,
+		"slots": null
+	},
+	{
+		"id": 5,
+		"name": "Fire",
+		"category": "Crafting Element",
+		"resourceExhausted": false,
+		"attack": 30,
+		"defense": 5,
+		"range": null,
+		"ammo": null,
+		"slots": null
+	}
+]
