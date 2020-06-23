@@ -1,6 +1,6 @@
-Current Version:
+# Current Version: v1.0
 
-v1.0:
+## v1.0:
 
 -   Sounds:
 
