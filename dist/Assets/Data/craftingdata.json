@@ -8,7 +8,9 @@
 		"defense": 5,
 		"range": null,
 		"ammo": null,
-		"slots": null
+		"slots": null,
+		"sound": "default",
+		"battleUnit": "none"
 	},
 	{
 		"id": 1,
@@ -19,7 +21,9 @@
 		"defense": 15,
 		"range": null,
 		"ammo": null,
-		"slots": null
+		"slots": null,
+		"sound": "default",
+		"battleUnit": "none"
 	},
 	{
 		"id": 2,
@@ -30,7 +34,9 @@
 		"defense": 5,
 		"range": null,
 		"ammo": null,
-		"slots": null
+		"slots": null,
+		"sound": "default",
+		"battleUnit": "none"
 	},
 	{
 		"id": 3,
@@ -41,7 +47,9 @@
 		"defense": 20,
 		"range": null,
 		"ammo": null,
-		"slots": null
+		"slots": null,
+		"sound": "wall",
+		"battleUnit": "defense"
 	},
 	{
 		"id": 4,
@@ -52,7 +60,9 @@
 		"defense": 0,
 		"range": null,
 		"ammo": null,
-		"slots": null
+		"slots": null,
+		"sound": "default",
+		"battleUnit": "none"
 	},
 	{
 		"id": 5,
@@ -63,7 +73,9 @@
 		"defense": 30,
 		"range": null,
 		"ammo": null,
-		"slots": null
+		"slots": null,
+		"sound": "spike",
+		"battleUnit": "defense"
 	},
 	{
 		"id": 6,
@@ -74,7 +86,9 @@
 		"defense": 5,
 		"range": 1,
 		"ammo": null,
-		"slots": null
+		"slots": null,
+		"sound": "sword",
+		"battleUnit": "attack"
 	},
 	{
 		"id": 7,
@@ -85,6 +99,8 @@
 		"defense": 10,
 		"range": null,
 		"ammo": null,
-		"slots": null
+		"slots": null,
+		"sound": "default",
+		"battleUnit": "none"
 	}
 ]

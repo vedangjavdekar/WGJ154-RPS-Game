@@ -10,7 +10,7 @@ import {
 	CrafingIconBackground,
 } from "../../classes/Inventory/IconBackground";
 import StatCard from "../../classes/StatCard";
-import { SOUNDS } from "../SFXScene";
+import { SOUNDS } from "../../sounds";
 
 /*********** CONSTANTS ****************/
 
@@ -18,7 +18,7 @@ const OBJECTS_DISPLAYED = 5;
 const INVENTORY_ITEM_SEPARATION = 148;
 const INVENTORY_OFFSET_X = 152;
 const INVENTORY_OFFSET_Y = 615;
-export const SPRITE_SCALE_UP = 5;
+export const SPRITE_SCALE_UP = 3;
 
 /******************************************/
 
@@ -52,12 +52,16 @@ export default class CraftingUIScene extends Phaser.Scene {
 	//userFeedbackText
 	private craftResultFeedbackText: Phaser.GameObjects.Text;
 
+	//RouterPath
+	fromBattle: boolean;
+
 	constructor() {
 		super(SCENES.CRAFTING_UI);
 	}
-
-	init() {
-		this.GEventEmitter = GameEventEmitter.getInstance();
+	addEvents() {
+		if (!this.GEventEmitter) {
+			this.GEventEmitter = GameEventEmitter.getInstance();
+		}
 		const clearEvents = [
 			GAME_EVENTS.buttonClick,
 			GAME_EVENTS.c_changeSelection,
@@ -70,14 +74,56 @@ export default class CraftingUIScene extends Phaser.Scene {
 			console.log("clearing:" + clearEvents[event]);
 			this.GEventEmitter.clearEvent(clearEvents[event]);
 		}
+
+		this.GEventEmitter.addListener(
+			GAME_EVENTS.buttonClick,
+			this.onButtonClicked,
+			this
+		);
+		this.GEventEmitter.addListener(
+			GAME_EVENTS.c_changeSelection,
+			this.onSelectedIndexChanged,
+			this
+		);
+		this.GEventEmitter.addListener(
+			GAME_EVENTS.c_dragIconPointerDown,
+			this.onDragIconPointerDown,
+			this
+		);
+		this.GEventEmitter.addListener(
+			GAME_EVENTS.c_craftingIconPointerOver,
+			this.onCraftingIconPointerOver,
+			this
+		);
+		this.GEventEmitter.addListener(
+			GAME_EVENTS.c_craftingIconPointerOut,
+			this.onCraftingIconPointerOut,
+			this
+		);
+	}
+	init(data: { fromBattle?: boolean }) {
+		console.log(data);
+		if (data.fromBattle) {
+			console.log("from battle: " + data.fromBattle);
+			this.fromBattle = data.fromBattle;
+		} else {
+			this.fromBattle = false;
+		}
+		this.addEvents();
 		this.inventoryManager = InventoryManager.getInstance();
 	}
 
 	preload() {
 		this.cameras.main.setBackgroundColor(CraftingPalette.background.css);
+		this.GEventEmitter.emit(
+			GAME_EVENTS.sfx_playSound,
+			SOUNDS.CRAFTINGLEVEL,
+			{ loop: true, volume: 0.55 }
+		);
 		this.selectedCraftingIcon = null;
 		IconBackground.selectedIndex = -1;
 		IconBackground.iconDragged = false;
+
 		this.itemsFilled = [];
 		CraftingUIScene.disableInventory = false;
 	}
@@ -184,7 +230,7 @@ export default class CraftingUIScene extends Phaser.Scene {
 			INVENTORY_OFFSET_Y
 		);
 
-		const indices = this.inventoryManager.getCraftedIndices();
+		const indices = this.inventoryManager.getArrayIndices("crafted");
 		console.log(indices);
 
 		this.inventoryOffset = 0;
@@ -261,31 +307,6 @@ export default class CraftingUIScene extends Phaser.Scene {
 		//#endregion
 
 		//#region EVENT LISTENSERS
-		this.GEventEmitter.addListener(
-			GAME_EVENTS.buttonClick,
-			this.onButtonClicked,
-			this
-		);
-		this.GEventEmitter.addListener(
-			GAME_EVENTS.c_changeSelection,
-			this.onSelectedIndexChanged,
-			this
-		);
-		this.GEventEmitter.addListener(
-			GAME_EVENTS.c_dragIconPointerDown,
-			this.onDragIconPointerDown,
-			this
-		);
-		this.GEventEmitter.addListener(
-			GAME_EVENTS.c_craftingIconPointerOver,
-			this.onCraftingIconPointerOver,
-			this
-		);
-		this.GEventEmitter.addListener(
-			GAME_EVENTS.c_craftingIconPointerOut,
-			this.onCraftingIconPointerOut,
-			this
-		);
 
 		this.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
 			if (this.pointerDown) {
@@ -342,9 +363,19 @@ export default class CraftingUIScene extends Phaser.Scene {
 	}
 
 	onExitClicked() {
+		if (CraftingUIScene.disableInventory) return;
+		this.GEventEmitter.emit(
+			GAME_EVENTS.sfx_stopSound,
+			SOUNDS.CRAFTINGLEVEL
+		);
 		this.cameras.main.fadeOut(500);
 		this.cameras.main.once("camerafadeoutcomplete", () => {
-			this.scene.start(SCENES.MENU);
+			if (!this.fromBattle) {
+				this.scene.start(SCENES.MENU);
+			} else {
+				this.scene.stop();
+				this.scene.get(SCENES.UI).scene.resume();
+			}
 		});
 	}
 
@@ -545,10 +576,21 @@ export default class CraftingUIScene extends Phaser.Scene {
 						this.cameras.main.flash(400);
 						this.element1.setVisible(false).setX(194);
 						this.element2.setVisible(false).setX(453);
-						this.GEventEmitter.emit(
-							GAME_EVENTS.sfx_playSound,
-							SOUNDS.NEWITEMCRAFTED
+
+						const sound = this.inventoryManager.getItemSound(
+							craftResult
 						);
+						if (sound !== "default") {
+							this.GEventEmitter.emit(
+								GAME_EVENTS.sfx_playSound,
+								sound
+							);
+						} else {
+							this.GEventEmitter.emit(
+								GAME_EVENTS.sfx_playSound,
+								SOUNDS.NEWITEMCRAFTED
+							);
+						}
 						this.craftResultFeedbackText.setText(
 							"Congratulations! New Element found!"
 						);
@@ -564,6 +606,7 @@ export default class CraftingUIScene extends Phaser.Scene {
 	}
 
 	invalidResutlTween() {
+		this.GEventEmitter.emit(GAME_EVENTS.sfx_playSound, SOUNDS.ITEMERROR);
 		this.tweens.add({
 			targets: [this.element1, this.element2],
 			ease: "Cubic.easeInOut",

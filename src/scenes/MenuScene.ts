@@ -2,36 +2,75 @@ import { SCENES, gameScreen, MainMenuConfig } from "../config";
 import GameEventEmitter, { GAME_EVENTS } from "../classes/GameEvents";
 import IButtonConfig, { ButtonIds } from "../classes/Button/IButtonConfig";
 import Button from "../classes/Button/Button";
-import { SOUNDS } from "./SFXScene";
+import { Scene } from "phaser";
+import InventoryManager from "../classes/Inventory/Inventorymanager";
+import { SOUNDS } from "../sounds";
+
+type SceneDataPair = {
+	key: string;
+	data?: any;
+};
 
 export default class MenuScene extends Phaser.Scene {
 	private GEventEmitter: GameEventEmitter;
-
+	private inventoryManager: InventoryManager;
+	private warningText: Phaser.GameObjects.Text;
 	constructor() {
 		super(SCENES.MENU);
 	}
-	init() {
-		this.GEventEmitter = GameEventEmitter.getInstance();
-		const clearEvents = [GAME_EVENTS.buttonClick];
+	addEvents() {
+		if (!this.GEventEmitter) {
+			this.GEventEmitter = GameEventEmitter.getInstance();
+		}
+		const clearEvents = [
+			GAME_EVENTS.buttonClick,
+			GAME_EVENTS.renableButton,
+		];
 
 		for (let event in clearEvents) {
 			console.log("clearing:" + clearEvents[event]);
 			this.GEventEmitter.clearEvent(clearEvents[event]);
 		}
+
+		this.GEventEmitter.addListener(
+			GAME_EVENTS.buttonClick,
+			this.onButtonClicked,
+			this
+		);
 	}
-	preload() {}
+
+	init() {
+		this.addEvents();
+		this.inventoryManager = InventoryManager.getInstance();
+	}
 
 	create() {
 		this.GEventEmitter.emit(GAME_EVENTS.sfx_playSound, SOUNDS.MAINMENU, {
 			loop: true,
 			volume: 0.05,
 		});
+
 		this.add
-			.text(gameScreen.width / 2, gameScreen.height / 4, "Game Title", {
+			.text(gameScreen.width / 2, gameScreen.height / 4, "Roshambros", {
 				font: `${MainMenuConfig.title.fontSize}px gameFont`,
 				fill: MainMenuConfig.title.fontColor,
 			})
 			.setOrigin(0.5);
+
+		this.warningText = this.add
+			.text(
+				gameScreen.width / 2,
+				(10 * gameScreen.height) / 12,
+				"You need at least one offensive unit and one defensive unit to enter battle mode",
+				{
+					font: `${MainMenuConfig.buttons.fontSize}px gameFont`,
+					fill: MainMenuConfig.title.fontColor,
+				}
+			)
+			.setWordWrapWidth(gameScreen.width / 2)
+			.setAlign("center")
+			.setOrigin(0.5)
+			.setAlpha(0);
 
 		//Button Config for menu buttons
 		const ButtonConfig: IButtonConfig = {
@@ -60,12 +99,6 @@ export default class MenuScene extends Phaser.Scene {
 			true
 		);
 
-		this.GEventEmitter.addListener(
-			GAME_EVENTS.buttonClick,
-			this.onButtonClicked,
-			this
-		);
-
 		this.cameras.main.fadeIn(500);
 	}
 
@@ -84,14 +117,38 @@ export default class MenuScene extends Phaser.Scene {
 
 	onBattleClicked() {
 		console.log("Battle Clicked");
-		this.onChangeScene([SCENES.GAME], 500);
-		this.GEventEmitter.emit(GAME_EVENTS.sfx_stopSound, SOUNDS.MAINMENU);
-		this.GEventEmitter.emit(GAME_EVENTS.sfx_playSound, SOUNDS.BUTTONBATTLE);
+		if (this.inventoryManager.getBattleReady()) {
+			const scenedatapairs: SceneDataPair[] = [
+				{
+					key: SCENES.GAME,
+				},
+				{
+					key: SCENES.UI,
+				},
+			];
+
+			this.onChangeScene(500, scenedatapairs);
+			this.GEventEmitter.emit(GAME_EVENTS.sfx_stopSound, SOUNDS.MAINMENU);
+			this.GEventEmitter.emit(
+				GAME_EVENTS.sfx_playSound,
+				SOUNDS.BUTTONBATTLE
+			);
+		} else {
+			this.warningText.setAlpha(1);
+		}
 	}
 
 	onCraftClicked() {
 		console.log("Craft Clicked");
-		this.onChangeScene([SCENES.CRAFTING_UI], 500);
+		const scenedatapairs: SceneDataPair[] = [
+			{
+				key: SCENES.CRAFTING_UI,
+				data: {
+					fromBattle: false,
+				},
+			},
+		];
+		this.onChangeScene(500, scenedatapairs);
 		this.GEventEmitter.emit(GAME_EVENTS.sfx_stopSound, SOUNDS.MAINMENU);
 		this.GEventEmitter.emit(
 			GAME_EVENTS.sfx_playSound,
@@ -100,16 +157,16 @@ export default class MenuScene extends Phaser.Scene {
 	}
 
 	//First scene would be started the rest would be launched
-	onChangeScene(keys: string[], fadeOutTime: number) {
+	onChangeScene(fadeOutTime: number, scenedata: SceneDataPair[]) {
 		this.cameras.main.fadeOut(fadeOutTime);
 		this.cameras.main.once("camerafadeoutcomplete", () => {
-			for (let i = 0; i < keys.length; i++) {
+			for (let i = 0; i < scenedata.length; i++) {
 				if (i === 0) {
-					console.log("starting scene: " + keys[i]);
-					this.scene.start(keys[i]);
+					console.log("starting scene: " + scenedata[i].key);
+					this.scene.start(scenedata[i].key, scenedata[i].data);
 				} else {
-					console.log("launching scene: " + keys[i]);
-					this.scene.launch(keys[i]);
+					console.log("launching scene: " + scenedata[i].key);
+					this.scene.launch(scenedata[i].key, scenedata[i].data);
 				}
 			}
 		});

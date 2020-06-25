@@ -186,12 +186,14 @@ export default class StatCard extends Phaser.GameObjects.Container {
 		this.attack.setText(data.attack + "%");
 		this.defense.setText(data.defense + "%");
 		if (data.range !== null) {
-			this.range.setText(data.range + "tiles");
+			this.range.setText(
+				data.range + " tile" + (data.range > 1 ? "s" : "")
+			);
 		} else {
 			this.range.setText("-");
 		}
 		if (data.ammo !== null) {
-			this.ammo.setText(data.range + "tiles");
+			this.ammo.setText(data.ammo + " rounds");
 		} else {
 			this.ammo.setText("-");
 		}

@@ -1,10 +1,32 @@
 export enum GAME_EVENTS {
 	buttonClick = "buttonClick",
-	gameStarted = "gameStarted",
+	renableButton = "renableButton",
+	disableButton = "disableButton",
 	gameOver = "gameOver",
+	gamePause = "gamePause",
+	//Modal Events
+	modalshow = "m_show",
+	modalhide = "m_hide",
+	modalexit = "m_exit",
+	modalconfirm = "m_confirm",
+	modaldeny = "m_deny",
+	//ProgressBar Events
+	progressbar_timeout = "progressbar_timeout",
+	progressbar_pause = "progressbar_pause",
+	progressbar_resume = "progressbar_resume",
+
+	//scrollbarEvents
+	sb_changeSelection = "sb_changeSelection",
+	sb_iconDragPointerDown = "sb_iconDragPointerDown",
+	sb_iconDragPointerUp = "sb_iconDragPointerUp",
+	sb_buttonEnableEvents = "sb_buttonEnableEvents",
+	sb_addElement = "sb_addElement",
+	sb_removeElement = "sb_removeElement",
 	//Sounds
 	sfx_playSound = "sfx_playSound",
 	sfx_stopSound = "Sfx_stopSound",
+	sfx_pauseSound = "sfx_pauseSound",
+	sfx_resumeSound = "sfx_resumeSound",
 
 	//Crafting Events
 	c_changeSelection = "c_changeSelection",

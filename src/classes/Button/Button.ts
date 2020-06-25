@@ -10,6 +10,8 @@ export default class Button extends Phaser.GameObjects.Container {
 	private animateText: boolean;
 	private canClick: boolean;
 	private id: string | number;
+	private config: IButtonConfig;
+
 	constructor(
 		scene: Phaser.Scene,
 		x: number,
@@ -23,9 +25,9 @@ export default class Button extends Phaser.GameObjects.Container {
 			Button.GEventEmitter = GameEventEmitter.getInstance();
 		}
 		super(scene, x, y);
-
 		this.id = button_id;
 		this.canClick = true;
+		this.config = config;
 		this.animateButton = config.image !== "";
 		this.animateText = text !== "";
 
@@ -35,7 +37,7 @@ export default class Button extends Phaser.GameObjects.Container {
 
 		if (this.animateText) {
 			this.buttonText = scene.add
-				.text(0, 0, text, {
+				.text(0, config.offset_y || 0, text, {
 					font: `${config.fontSize}px gameFont`,
 					fill: config.fontColor,
 				})
@@ -66,34 +68,20 @@ export default class Button extends Phaser.GameObjects.Container {
 		if (containerChildren.length > 0) {
 			this.add(containerChildren);
 			scene.add.existing(this);
-
+			this.addEvents();
 			//Pointer events
 			this.buttonZone.on("pointerover", () => {
 				if (clickOnce) {
 					if (!this.canClick) return;
 				}
-				//Check if text exists
-				if (this.animateText) {
-					this.buttonText.setFontSize(config.fontSize + 4);
-				}
-				//Check if image exists
-				if (this.animateButton) {
-					this.buttonImage.setFrame(1);
-				}
+				this.setButtonState(1);
 			});
 
 			this.buttonZone.on("pointerout", () => {
 				if (clickOnce) {
 					if (!this.canClick) return;
 				}
-				//Check if text exists
-				if (this.animateText) {
-					this.buttonText.setFontSize(config.fontSize);
-				}
-				//Check if image exists
-				if (this.animateButton) {
-					this.buttonImage.setFrame(0);
-				}
+				this.setButtonState(0);
 			});
 
 			this.buttonZone.on("pointerdown", () => {
@@ -101,16 +89,88 @@ export default class Button extends Phaser.GameObjects.Container {
 					if (!this.canClick) return;
 					this.canClick = false;
 				}
+				this.setButtonState(2);
+				Button.GEventEmitter.emit(GAME_EVENTS.buttonClick, this.id);
+			});
+		}
+	}
+	addEvents() {
+		Button.GEventEmitter.addListener(
+			GAME_EVENTS.renableButton,
+			this.onRenableButton,
+			this
+		);
+		Button.GEventEmitter.addListener(
+			GAME_EVENTS.disableButton,
+			this.onDisableButton,
+			this
+		);
+	}
+
+	onRenableButton(id: string | number) {
+		if (this.id === id) {
+			console.log("Renabled: " + this.id);
+			this.setButtonState(0);
+			this.canClick = true;
+		}
+	}
+	onDisableButton(id: string | number) {
+		if (this.id === id) {
+			console.log("Disabled: " + this.id);
+			this.canClick = false;
+		}
+	}
+
+	setButtonState(state: number) {
+		switch (state) {
+			case 0: {
 				//Check if text exists
 				if (this.animateText) {
-					this.buttonText.setFontSize(config.fontSize + 2);
+					this.buttonText.setFontSize(this.config.fontSize);
+					if (this.config.animatedText) {
+						this.buttonText.setFill(
+							this.config.animatedText.normal
+						);
+					}
+				}
+				//Check if image exists
+				if (this.animateButton) {
+					this.buttonImage.setFrame(0);
+				}
+				break;
+			}
+			case 1: {
+				//Check if text exists
+				if (this.animateText) {
+					this.buttonText.setFontSize(this.config.fontSize + 4);
+					if (this.config.animatedText) {
+						this.buttonText.setFill(
+							this.config.animatedText.highlighted
+						);
+					}
+				}
+				//Check if image exists
+				if (this.animateButton) {
+					this.buttonImage.setFrame(1);
+				}
+				break;
+			}
+			case 2: {
+				//Check if text exists
+				if (this.animateText) {
+					this.buttonText.setFontSize(this.config.fontSize + 2);
+					if (this.config.animatedText) {
+						this.buttonText.setFill(
+							this.config.animatedText.pressed
+						);
+					}
 				}
 				//Check if image exists
 				if (this.animateButton) {
 					this.buttonImage.setFrame(2);
 				}
-				Button.GEventEmitter.emit(GAME_EVENTS.buttonClick, this.id);
-			});
+				break;
+			}
 		}
 	}
 }

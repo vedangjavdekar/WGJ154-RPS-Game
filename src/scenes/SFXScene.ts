@@ -1,15 +1,7 @@
 import { SCENES } from "../config";
 import GameEventEmitter, { GAME_EVENTS } from "../classes/GameEvents";
-export enum SOUNDS {
-	BUTTON = "button",
-	BUTTONCRAFTING = "buttoncrafting",
-	BUTTONBATTLE = "buttonbattle",
-	CARDSWIPE = "cardswipe",
-	DESTROYOBJECT = "destroyobject",
-	PLACEOBJECT = "placeobject",
-	MAINMENU = "mainmenu",
-	NEWITEMCRAFTED = "newitemcrafted",
-}
+import { SOUNDS } from "../sounds";
+
 type SoundMap = {
 	[key: string]: Phaser.Sound.HTML5AudioSound;
 };
@@ -26,8 +18,17 @@ export default class SFXScene extends Phaser.Scene {
 		console.log("SFX running");
 		this.soundOn = true;
 		const GEventEmitter = GameEventEmitter.getInstance();
-		GEventEmitter.clearEvent(GAME_EVENTS.sfx_playSound);
-		GEventEmitter.clearEvent(GAME_EVENTS.sfx_stopSound);
+		const clearEvents = [
+			GAME_EVENTS.sfx_playSound,
+			GAME_EVENTS.sfx_pauseSound,
+			GAME_EVENTS.sfx_resumeSound,
+			GAME_EVENTS.sfx_stopSound,
+		];
+
+		for (let event in clearEvents) {
+			console.log("clearing:" + clearEvents[event]);
+			GEventEmitter.clearEvent(clearEvents[event]);
+		}
 
 		GEventEmitter.addListener(
 			GAME_EVENTS.sfx_playSound,
@@ -37,6 +38,16 @@ export default class SFXScene extends Phaser.Scene {
 		GEventEmitter.addListener(
 			GAME_EVENTS.sfx_stopSound,
 			this.onStopSound,
+			this
+		);
+		GEventEmitter.addListener(
+			GAME_EVENTS.sfx_pauseSound,
+			this.onPauseSound,
+			this
+		);
+		GEventEmitter.addListener(
+			GAME_EVENTS.sfx_resumeSound,
+			this.onResumeSound,
 			this
 		);
 	}
@@ -60,6 +71,18 @@ export default class SFXScene extends Phaser.Scene {
 	onStopSound(key: string) {
 		if (this.soundOn) {
 			this.sounds[key].stop();
+		}
+	}
+
+	onPauseSound(key: string) {
+		if (this.soundOn) {
+			if (!this.sounds[key].isPaused) this.sounds[key].pause();
+		}
+	}
+
+	onResumeSound(key: string) {
+		if (this.soundOn) {
+			if (this.sounds[key].isPaused) this.sounds[key].resume();
 		}
 	}
 }

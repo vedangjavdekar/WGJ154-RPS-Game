@@ -12,6 +12,8 @@ export class InventoryItemData {
 	range: statProp;
 	ammo: statProp;
 	slots: statProp;
+	sound: string;
+	battleUnit: string;
 }
 
 export default class InventoryItem extends Phaser.GameObjects.Sprite {

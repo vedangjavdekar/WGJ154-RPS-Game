@@ -115,6 +115,27 @@ export const CraftingConfig = {
 	},
 };
 
+export const BattleConfig = {
+	Game: {},
+	UI: {
+		Modal: {
+			fontColor: "#fff",
+			title: { fontSize: FontSizes.h4 },
+			button: {
+				fontSize: FontSizes.h5,
+				fontColor: "#232323",
+			},
+		},
+		title: { fontSize: FontSizes.h2 },
+		fontColor: "#fff",
+		fontSize: FontSizes.h6,
+		button: {
+			fontSize: FontSizes.h5,
+			fontColor: "#9A9A9A",
+		},
+	},
+};
+
 //Scene names
 export const SCENES = {
 	BOOT: "BOOT",

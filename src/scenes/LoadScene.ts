@@ -1,8 +1,12 @@
 import { SCENES, LoadingBarConfig, gameScreen } from "../config";
 import { ASSET_PATHS } from "../assetpaths";
 import InventoryManager from "../classes/Inventory/Inventorymanager";
-import { dataKey } from "../classes/Inventory/config";
-import { SOUNDS } from "./SFXScene";
+import {
+	dataKey,
+	attackdatakey,
+	defensedatakey,
+} from "../classes/Inventory/config";
+import { SOUNDS } from "../sounds";
 
 export default class LoadScene extends Phaser.Scene {
 	constructor() {
@@ -119,8 +123,8 @@ export default class LoadScene extends Phaser.Scene {
 
 		//This will be a sprite atlas with names matching to those with the craftingdata
 		this.load.spritesheet("gameobjects", ASSET_PATHS.SPRITES.SPRITESHEET, {
-			frameWidth: 16,
-			frameHeight: 16,
+			frameWidth: 32,
+			frameHeight: 32,
 		});
 
 		//This is temporary
@@ -128,20 +132,79 @@ export default class LoadScene extends Phaser.Scene {
 			frameWidth: 190,
 			frameHeight: 49,
 		});
+		//#region BATTLE ASSET IMPORTS
+		this.load.image(
+			"b_game_background",
+			ASSET_PATHS.BATTLELAYOUT.GAME.BACKGROUND
+		);
+		this.load.image("b_game_tile", ASSET_PATHS.BATTLELAYOUT.GAME.TILE);
+		this.load.image(
+			"b_game_defenseslottile",
+			ASSET_PATHS.BATTLELAYOUT.GAME.DEFENSESLOTTILE
+		);
+		this.load.image(
+			"b_ui_arrowbutton",
+			ASSET_PATHS.BATTLELAYOUT.UI.BUTTONS.ARROWBUTTON
+		);
+		this.load.spritesheet(
+			"b_ui_button",
+			ASSET_PATHS.BATTLELAYOUT.UI.BUTTONS.UIBUTTON,
+			{ frameWidth: 64, frameHeight: 64 }
+		);
+		this.load.spritesheet(
+			"b_ui_craftbutton",
+			ASSET_PATHS.BATTLELAYOUT.UI.BUTTONS.CRAFTBUTTON,
+			{ frameWidth: 64, frameHeight: 64 }
+		);
+		this.load.spritesheet(
+			"b_ui_destroybutton",
+			ASSET_PATHS.BATTLELAYOUT.UI.BUTTONS.DESTROYBUTTON,
+			{ frameWidth: 64, frameHeight: 64 }
+		);
+		this.load.spritesheet(
+			"b_ui_exitbutton",
+			ASSET_PATHS.BATTLELAYOUT.UI.BUTTONS.EXITBUTTON,
+			{ frameWidth: 64, frameHeight: 64 }
+		);
+		this.load.image(
+			"b_ui_uipanel",
+			ASSET_PATHS.BATTLELAYOUT.UI.PANELS.UIPANEL
+		);
+		this.load.image(
+			"b_ui_cardspanel",
+			ASSET_PATHS.BATTLELAYOUT.UI.PANELS.CARDSPANEL
+		);
+		this.load.image(
+			"b_ui_statspanel",
+			ASSET_PATHS.BATTLELAYOUT.UI.PANELS.STATSPANEL
+		);
+		this.load.image(
+			"b_ui_modalpanel",
+			ASSET_PATHS.BATTLELAYOUT.UI.PANELS.MODALPANEL
+		);
+		this.load.image(
+			"b_ui_healthbarborder",
+			ASSET_PATHS.BATTLELAYOUT.UI.HEALTHBAR.HEALTHBARBORDER
+		);
+		this.load.image(
+			"b_ui_healthbarfill",
+			ASSET_PATHS.BATTLELAYOUT.UI.HEALTHBAR.HEALTHBARFILL
+		);
+		//#endregion
 
 		//#region CRAFTING UI IMPORTS
 		this.load.image(
 			"c_arrow_left",
-			ASSET_PATHS.SPRITES.CRAFTINGLAYOUT.BUTTONS.ARROW_LEFT
+			ASSET_PATHS.CRAFTINGLAYOUT.BUTTONS.ARROW_LEFT
 		);
 		this.load.image(
 			"c_arrow_right",
-			ASSET_PATHS.SPRITES.CRAFTINGLAYOUT.BUTTONS.ARROW_RIGHT
+			ASSET_PATHS.CRAFTINGLAYOUT.BUTTONS.ARROW_RIGHT
 		);
 
 		this.load.spritesheet(
 			"c_exit_button",
-			ASSET_PATHS.SPRITES.CRAFTINGLAYOUT.BUTTONS.EXITBUTTON,
+			ASSET_PATHS.CRAFTINGLAYOUT.BUTTONS.EXITBUTTON,
 			{
 				frameWidth: 72,
 				frameHeight: 72,
@@ -150,7 +213,7 @@ export default class LoadScene extends Phaser.Scene {
 
 		this.load.spritesheet(
 			"c_crafticon",
-			ASSET_PATHS.SPRITES.CRAFTINGLAYOUT.ICONBACKGROUDS.CRAFTICON_BG,
+			ASSET_PATHS.CRAFTINGLAYOUT.ICONBACKGROUDS.CRAFTICON_BG,
 			{
 				frameWidth: 136,
 				frameHeight: 136,
@@ -158,7 +221,7 @@ export default class LoadScene extends Phaser.Scene {
 		);
 		this.load.spritesheet(
 			"c_inventoryicon",
-			ASSET_PATHS.SPRITES.CRAFTINGLAYOUT.ICONBACKGROUDS.INVENTORYICON,
+			ASSET_PATHS.CRAFTINGLAYOUT.ICONBACKGROUDS.INVENTORYICON,
 			{
 				frameWidth: 128,
 				frameHeight: 128,
@@ -166,15 +229,15 @@ export default class LoadScene extends Phaser.Scene {
 		);
 		this.load.image(
 			"c_banner",
-			ASSET_PATHS.SPRITES.CRAFTINGLAYOUT.PANELS.CRAFTINGBANNER
+			ASSET_PATHS.CRAFTINGLAYOUT.PANELS.CRAFTINGBANNER
 		);
 		this.load.image(
 			"c_inventory_panel",
-			ASSET_PATHS.SPRITES.CRAFTINGLAYOUT.PANELS.INVENTORYPANEL
+			ASSET_PATHS.CRAFTINGLAYOUT.PANELS.INVENTORYPANEL
 		);
 		this.load.image(
 			"c_card_panel",
-			ASSET_PATHS.SPRITES.CRAFTINGLAYOUT.PANELS.STATSCARD
+			ASSET_PATHS.CRAFTINGLAYOUT.PANELS.STATSCARD
 		);
 
 		//Line in the crafting stat card.
@@ -184,55 +247,81 @@ export default class LoadScene extends Phaser.Scene {
 		graphics.generateTexture("c_card_line", 320, 2);
 		graphics.clear();
 
-		this.load.image(
-			"c_plus",
-			ASSET_PATHS.SPRITES.CRAFTINGLAYOUT.SYMBOLS.PLUS
-		);
+		this.load.image("c_plus", ASSET_PATHS.CRAFTINGLAYOUT.SYMBOLS.PLUS);
 		this.load.image(
 			"c_equalto",
-			ASSET_PATHS.SPRITES.CRAFTINGLAYOUT.SYMBOLS.EQUALTO
+			ASSET_PATHS.CRAFTINGLAYOUT.SYMBOLS.EQUALTO
 		);
 		//#endregion
 
 		//#region MUSIC AND SFX
 		this.load.audio(SOUNDS.BUTTONCRAFTING, [
-			ASSET_PATHS.SOUNDS.BUTTONCRAFTING_MP3,
-			ASSET_PATHS.SOUNDS.BUTTONCRAFTING_OGG,
+			ASSET_PATHS.SOUND_PATHS.BUTTONCRAFTING_MP3,
+			ASSET_PATHS.SOUND_PATHS.BUTTONCRAFTING_OGG,
 		]);
 		this.load.audio(SOUNDS.BUTTONBATTLE, [
-			ASSET_PATHS.SOUNDS.BUTTONBATTLE_MP3,
-			ASSET_PATHS.SOUNDS.BUTTONBATTLE_OGG,
+			ASSET_PATHS.SOUND_PATHS.BUTTONBATTLE_MP3,
+			ASSET_PATHS.SOUND_PATHS.BUTTONBATTLE_OGG,
 		]);
 		this.load.audio(SOUNDS.BUTTON, [
-			ASSET_PATHS.SOUNDS.BUTTON_MP3,
-			ASSET_PATHS.SOUNDS.BUTTON_OGG,
-		]);
-		this.load.audio(SOUNDS.CARDSWIPE, [
-			ASSET_PATHS.SOUNDS.CARDSWIPE_MP3,
-			ASSET_PATHS.SOUNDS.CARDSWIPE_OGG,
-		]);
-		this.load.audio(SOUNDS.DESTROYOBJECT, [
-			ASSET_PATHS.SOUNDS.DESTROYOBJECT_MP3,
-			ASSET_PATHS.SOUNDS.DESTROYOBJECT_OGG,
-		]);
-		this.load.audio(SOUNDS.PLACEOBJECT, [
-			ASSET_PATHS.SOUNDS.PLACEOBJECT_MP3,
-			ASSET_PATHS.SOUNDS.PLACEOBJECT_OGG,
-		]);
-		this.load.audio(SOUNDS.MAINMENU, [
-			ASSET_PATHS.SOUNDS.MAINMENU_MP3,
-			ASSET_PATHS.SOUNDS.MAINMENU_OGG,
+			ASSET_PATHS.SOUND_PATHS.BUTTON_MP3,
+			ASSET_PATHS.SOUND_PATHS.BUTTON_OGG,
 		]);
 		this.load.audio(SOUNDS.NEWITEMCRAFTED, [
-			ASSET_PATHS.SOUNDS.NEWITEMCRAFTED_MP3,
-			ASSET_PATHS.SOUNDS.NEWITEMCRAFTED_OGG,
+			ASSET_PATHS.SOUND_PATHS.NEWITEMCRAFTED_MP3,
+			ASSET_PATHS.SOUND_PATHS.NEWITEMCRAFTED_OGG,
 		]);
+		this.load.audio(SOUNDS.CARDSWIPE, [
+			ASSET_PATHS.SOUND_PATHS.CARDSWIPE_MP3,
+			ASSET_PATHS.SOUND_PATHS.CARDSWIPE_OGG,
+		]);
+		this.load.audio(SOUNDS.DESTROYOBJECT, [
+			ASSET_PATHS.SOUND_PATHS.DESTROYOBJECT_MP3,
+			ASSET_PATHS.SOUND_PATHS.DESTROYOBJECT_OGG,
+		]);
+		this.load.audio(SOUNDS.PLACEOBJECT, [
+			ASSET_PATHS.SOUND_PATHS.PLACEOBJECT_MP3,
+			ASSET_PATHS.SOUND_PATHS.PLACEOBJECT_OGG,
+		]);
+		this.load.audio(SOUNDS.MAINMENU, [
+			ASSET_PATHS.SOUND_PATHS.MAINMENU_MP3,
+			ASSET_PATHS.SOUND_PATHS.MAINMENU_OGG,
+		]);
+		this.load.audio(SOUNDS.CRAFTINGLEVEL, [
+			ASSET_PATHS.SOUND_PATHS.CRAFTINGLEVEL_MP3,
+			ASSET_PATHS.SOUND_PATHS.CRAFTINGLEVEL_OGG,
+		]);
+		console.log("before loading battle level");
+		this.load.audio(SOUNDS.BATTLELEVEL, [
+			ASSET_PATHS.SOUND_PATHS.BATTLELEVEL_MP3,
+			ASSET_PATHS.SOUND_PATHS.BATTLELEVEL_OGG,
+		]);
+		console.log("battle level loaded");
+		this.load.audio(SOUNDS.ITEMERROR, [
+			ASSET_PATHS.SOUND_PATHS.ITEMERROR_MP3,
+			ASSET_PATHS.SOUND_PATHS.ITEMERROR_OGG,
+		]);
+		this.load.audio(SOUNDS.SPIKE, [
+			ASSET_PATHS.SOUND_PATHS.SPIKE_MP3,
+			ASSET_PATHS.SOUND_PATHS.SPIKE_OGG,
+		]);
+		this.load.audio(SOUNDS.WALL, [
+			ASSET_PATHS.SOUND_PATHS.WALL_MP3,
+			ASSET_PATHS.SOUND_PATHS.WALL_OGG,
+		]);
+		this.load.audio(SOUNDS.SWORD, [
+			ASSET_PATHS.SOUND_PATHS.SWORD_MP3,
+			ASSET_PATHS.SOUND_PATHS.SWORD_OGG,
+		]);
+
 		//#endregion
 	}
 	create() {
 		const data = this.cache.json.get("database");
 		//********************** DELETE THIS IN ACTUAL GAME *****************************/
 		window.localStorage.removeItem(dataKey);
+		window.localStorage.removeItem(attackdatakey);
+		window.localStorage.removeItem(defensedatakey);
 		//*******************************************************************************/
 		if (window.localStorage.getItem(dataKey) === null) {
 			let initialData = [0, 1, 2];
